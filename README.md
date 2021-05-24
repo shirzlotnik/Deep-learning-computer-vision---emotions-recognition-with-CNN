@@ -7,17 +7,17 @@ building CNN module that will learn how to recognize facial expression from imag
 ```
 
 file in use
-user_menu.py
-unload_dataset.py
-ProcessingDataset.py
-my_Model.py
-ModelTrain.py
+user_menu.py 
+unload_dataset.py  
+ProcessingDataset.py  
+my_Model.py  
+ModelTrain.py  
 
-python version - Python 3.7.9
+python version - Python 3.7.9  
 
 
 
-Packages versions
+Packages versions  
 
 Package | Version | Install command 
 ------------ | ------------- | ------------- 

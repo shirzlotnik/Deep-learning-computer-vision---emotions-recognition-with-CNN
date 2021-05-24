@@ -27,7 +27,7 @@ from keras.layers import Dense, Dropout, Activation, Flatten
 from keras.layers import Conv2D, MaxPooling2D, BatchNormalization
 from keras.losses import categorical_crossentropy
 from sklearn.metrics import accuracy_score
-from keras.optimizers import adam
+#from keras.optimizers import adam
 from keras.regularizers import l2
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import classification_report, confusion_matrix
@@ -116,7 +116,6 @@ class my_model:
         """
         return model
     
-    #model3 = build_model.__func__(48,48,7,64)
 
     
         

@@ -18,14 +18,11 @@ from keras.callbacks import EarlyStopping
 from keras.preprocessing.image import ImageDataGenerator
 import random
 
-from sklearn.model_selection import train_test_split
-
-
 from keras.models import Sequential
 
 
 import my_Model
-import unload_dataset
+#import unload_dataset
 #import preprocessing
 
 class training_Model:
@@ -48,7 +45,7 @@ class training_Model:
         self.data_train = data_train
         self.data_val   = data_val
         self.data_test  = data_test
-        self.model = keras.Sequential()
+        self.__model = keras.Sequential()
         
         
     def __CRNO(self, data, dataName):
@@ -59,7 +56,7 @@ class training_Model:
         """
         data['pixels'] = data['pixels'].apply(lambda pixel_sequence: [int(pixel) for pixel in pixel_sequence.split()])
         data_X = np.array(data['pixels'].tolist(), dtype='float32').reshape(-1,self.width, self.height,1)/255.0   
-        data_Y = to_categorical(data['emotion'], self.num_classes)  
+        data_Y = to_categorical(data['expression'], self.num_classes)  
         print("{}, _X shape: {}, , {}, _Y shape: {}".format(dataName, data_X.shape, dataName, data_Y.shape))
         
         return data_X, data_Y 
@@ -116,8 +113,6 @@ class training_Model:
                                       callbacks = [es],
                                       validation_data=(val_X, val_Y))
         
-        #history = model.fit(train_X, train_Y, validation_data=(val_X, val_Y), epochs=300, verbose=0)
-        
         # Evaluate the model on the test data using `evaluate`
         print('Evaluate on test data')
         
@@ -166,68 +161,29 @@ class training_Model:
         self.__plot_lossAndacc(history)
         self.__plot_graphs(history)
         
-        
-        """
     def predictRandomImage(self):
-        
+        """
         Generate predictions (probabilities -- the output of the last layer)
         on new data using `predict`
-        
+        """
         test_X, test_Y   = self.__CRNO(self.data_test, "test") #test data
         
-        #model = my_Model.my_model.build_model(self.width,self.height,self.num_classes,self.num_features)
+        model = my_Model.my_model.build_model(self.width,self.height,self.num_classes,self.num_features)
 
         #num = random.randint()
         print('Predict the classes: ')
-        prediction = self.model.predict(test_X[0:1])
+        prediction = model.predict(test_X[0:1])
         print('Predicted class: ', prediction)
         print('Real class:  ', test_Y[0:1])
-        
-    def predictRandomImage2(self):
-        pixels_colmn = self.data.iloc[:,-2]
-        emotion_colmn = self.data.iloc[:,-3]
-        
-        #(trainX, testX, trainY, testY) = train_test_split(pixels_colmn, emotion_colmn, test_size=0.2, random_state=42)
-        test_X, test_Y   = self.__CRNO(self.data_test, "test") #test data
-        train_X, train_Y = self.__CRNO(self.data_train, "train") #training data
 
-        
-        
-        y_pred = self.model.predict(train_X, batch_size=100)
-        y_pred1D = y_pred.argmax(1)
-        y_test1D = test_Y.argmax(1)
-        print ('Accuracy on validation data: ' + str(accuracy_score(y_test1D, y_pred1D)))
-        print()
-        score_Keras = self.model.evaluate(test_X, test_Y, batch_size=200)
-        print('Accuracy on validation data with Keras: ' + str(score_Keras[1]))
-
-
-    def PredictEmotion(self):
-        self.model.compile(optimizer= 'adam' , loss= 'categorical_crossentropy', metrics=['accuracy'])
-
-        train_X, train_Y = self.__CRNO(self.data_train, "train") #training data
-        test_X, test_Y   = self.__CRNO(self.data_test, "test") #test data
-        _, train_acc = self.model.evaluate(train_X, train_Y, verbose=0)
-        _, test_acc = self.model.evaluate(test_X, test_Y, verbose=0)
-        print()
-        print('Train: {}, Test: {}'.format(train_acc, test_acc))
-
-
-
-        
-
-
-
-emotion_map = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
+""" 
 file_path = '/Users/shirzlotnik/emotion_dataset/fer2013.csv' # file path in the computer      
-data = unload_dataset.open_dataset(file_path)
-data = unload_dataset.fixUsageValues(data, emotion_map)
-
+data = pd.read_csv(file_path)
+data = data.rename(columns={'emotion': 'expression'})
 data_train = data[data['Usage']=='Training'].copy()
 data_val   = data[data['Usage']=='PublicTest'].copy()
 data_test  = data[data['Usage']=='PrivateTest'].copy()
 tr = training_Model(data, data_train, data_val, data_test)
-tr.PredictEmotion()
-"""
-    
+tr.predictRandomImage()
+"""    
         

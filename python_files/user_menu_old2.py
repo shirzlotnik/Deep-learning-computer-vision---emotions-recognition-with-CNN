@@ -20,21 +20,20 @@ import ProcessingDataset
 
 
 file_path = '/Users/shirzlotnik/emotion_dataset/fer2013.csv' # file path in the computer
-emotion_map = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
+expression_map = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
 
 
-#data,fl = unload_dataset.open_dataset()
+data = unload_dataset.open_dataset()
 # update dataset usage to 70% training, 20% validation and 10% test
 
-#emotion_counts = unload_dataset.check_target_labels(data, emotion_map)
-#new_data = unload_dataset.fixUsageValues(data, emotion_counts)
-#data = new_data
-"""
-data = unload_dataset.open_dataset(file_path)
+facial_counts = unload_dataset.check_target_labels(data, expression_map)
+new_data = unload_dataset.fixUsageValues(data, facial_counts)
+data = new_data
+
 data_train = data[data['Usage']=='Training'].copy()
 data_val   = data[data['Usage']=='PublicTest'].copy()
 data_test  = data[data['Usage']=='PrivateTest'].copy()
-"""
+
 #emotion_counts = unload_dataset.emotion_counts
 
 
@@ -55,16 +54,24 @@ def user_options():
     
 #user_options()
 
-def case_one(file_path):
+def case_one(data):
     """
-    file_path: path to the place the dataset or ziped dataset are
+    data: the dataset- DataFrame type
     the function calls module unload_dataset to download the dataset and open it with pandas
     and plot some information about the dataset
     """
-    #data , fl = unload_dataset.open_dataset(file_path)
-    unload_dataset.handle_unloadDataset(emotion_map, file_path)
+    """
+    unload_dataset.extractDatasetFromZip()
+    
+    unload_dataset.check_data_()
+    #unload_dataset.Print_enotion_Counts()
+    unload_dataset.check_target_labels()
+    unload_dataset.plot_class_distribution()
+    unload_dataset.plot_images()
+    """
+    unload_dataset.handle_unloadDataset(data, expression_map)
 
-def case_two(data, emotion_map): 
+def case_two(data, expression_map): 
     """
     the function calls module preprocessing to process the dataset and present to the user with graph
     and numbers
@@ -77,11 +84,7 @@ def case_two(data, emotion_map):
     preprocessing.build_graphs_numberOfExp_forUsage()
     """
     
-    data_train = data[data['Usage']=='Training'].copy()
-    data_val   = data[data['Usage']=='PublicTest'].copy()
-    data_test  = data[data['Usage']=='PrivateTest'].copy()
-    
-    process_obj = ProcessingDataset.ProcessDataset(data, emotion_map, data_train, data_val, data_test)
+    process_obj = ProcessingDataset.ProcessDataset(data, expression_map, data_train, data_val, data_test)
     process_obj.handel_process_dataset()
     
     
@@ -102,11 +105,11 @@ def case_three(data):
     num_epochs = input('Please enter numer of epoch => ')
     model = my_Model.my_model.build_model(width, height, num_classes, num_features)
     """
-    
+    """
     data_train = data[data['Usage']=='Training'].copy()
     data_val   = data[data['Usage']=='PublicTest'].copy()
     data_test  = data[data['Usage']=='PrivateTest'].copy()
-    
+    """
     train_obj = ModelTrain.training_Model(data, data_train, data_val, data_test)
     train_obj.handle_train()
     
@@ -122,28 +125,18 @@ def main_menu():
     """
     #directories_file.create_directories_file()
     
-    file_path = '/Users/shirzlotnik/emotion_dataset/fer2013.csv' # file path in the computer
-    #zip_path = '/Users/shirzlotnik/emotion_dataset.zip'
-    emotion_map = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
-    #data = unload_dataset.open_dataset(file_path)
-    data = unload_dataset.open_dataset(file_path)
-    data = unload_dataset.fixUsageValues(data, emotion_map)
-
-    
     while(flag):
         #print("--> Your Choice: ")
         choice = input("==> Enter Your Choice: ")
         print()
-
+        
         if choice == '1':
             """
             if the use enter 1 -> the datasat download
             """
-            print("[INFO] Downloading dataset  \n")
-            case_one(file_path) 
+            case_one(data) 
             print()
             print("[INFO] Download dataset succecfuly \n")
-
             #print()
     
         if choice == '2':
@@ -151,8 +144,8 @@ def main_menu():
             if the use enter 2 -> the pre-processing of the data begins, the user will see how the data is
             sorted, how many images there are with graph.
             """
-            print("[INFO] Process of the dataset\n")
-            case_two(data, emotion_map)
+            print("[INFO] Process of the dataset")
+            case_two(data, expression_map)
             
          
         if choice == '3':

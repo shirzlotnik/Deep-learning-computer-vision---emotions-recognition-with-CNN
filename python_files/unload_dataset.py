@@ -16,9 +16,11 @@ import zipfile
 import matplotlib.pyplot as plt #for the graphs and images
 import seaborn as sns #for the graphs
 
-file_path = '/Users/shirzlotnik/emotion_dataset/fer2013.csv' # file path in the computer
-zip_path = '/Users/shirzlotnik/emotion_dataset.zip'
-emotion_map = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
+import PrintsForUser
+
+#file_path = '/Users/shirzlotnik/emotion_dataset/fer2013.csv' # file path in the computer
+#zip_path = '/Users/shirzlotnik/emotion_dataset.zip'
+#emotion_map = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
 
 
 
@@ -39,7 +41,6 @@ def open_dataset(file_path):
     return data
 
 
-#data = pd.read_csv(file_path)  #open dataset with pandas
 
 def fixUsageValues(data, emotion_map):
     """
@@ -53,15 +54,11 @@ def fixUsageValues(data, emotion_map):
     number_list = []
     for info in range(len(emotion_counts.values)):
         number_list.append(emotion_counts.values[info][1])
-    #print(number_list)
-    #print()
     
     transferImg_list = []
     for info in range(len(number_list)):
         transferImg_list.append(int(number_list[info] / 10)) # 10% of total number of images per expewssion
-    #print(transferImg_list)
-    #print()
-    #return number_list, transferImg_list
+
     
     # change 10% of each facial expression from training to validation
     for i in range(7):
@@ -85,23 +82,18 @@ def getIndexList(facex_data):
 
 
 
-"""
-data.loc[-1] = [7,None,'Training'] # add 'other' column in case the image is not any of the emotions
-data.loc[-2] = [7,None,'PublicTest']
-data.loc[-3] = [7,None,'PrivateTest']
-"""
 def check_data(data):
     """
     data: the dataset- DataFrame object
     the function print to user the shape of the dataset, the first 5 lines 
     and the usage values suppose to be 80% training, 10% validation and 10% test
     """
+    print('Dataset Information')
     print(data.shape) # check data shape
     print()
     print(data.head(5)) # preview first 5 row of data
     print()
     print(data.Usage.value_counts()) # check usage values
-    print()
     
 
 def check_target_labels(data, emotion_map):
@@ -122,24 +114,6 @@ def check_target_labels(data, emotion_map):
 
     
 
-"""
-#split data into training, validation and test set
-data_train = new_data[new_data['Usage']=='Training'].copy()
-data_val   = new_data[new_data['Usage']=='PublicTest'].copy()
-data_test  = new_data[new_data['Usage']=='PrivateTest'].copy()
-print("train shape: {}, \nvalidation shape: {}, \ntest shape: {}".format(data_train.shape, data_val.shape, data_test.shape))
-print()
-print(data['expression'].value_counts(sort=True))
-print()
-print(new_data['expression'].value_counts(sort=True))
-
-#print(facial_counts.values[0][1])
-#facex_data = updateUsageValues(data, numbersLi, transferLi)
-#dict_data = facex_data.to_dict('split')
-#print(dict_data.get('index'))
-#index_list = dict_data.get('index')
-#print(facial_counts)
-"""
 
 def plot_class_distribution(emotion_counts):
     """
@@ -155,9 +129,10 @@ def plot_class_distribution(emotion_counts):
 
 # plot some images
 
-def row2image(row):
+def row2image(row, emotion_map):
     '''
     row: row from the dataset, type='pandas.core.series.Series'
+    emotion_map: 
     the function takes the information from the pixels and emotion columns and tranfer it to 48*48 image
     return: 'numpy.ndarray' of the image
     '''
@@ -170,15 +145,16 @@ def row2image(row):
     image[:,:,2] = img
     return np.array([image.astype(np.uint8), emotions])
 
-def plot_images(data):
+def plot_images(data, emotion_map):
     """
     data: the dataset- DataFrame object
+    emotion_map:
     the function uses matplotlib libary to plot the images to the user
     """
     plt.figure(0, figsize=(12,6))
     for i in range(1,8):
         face = data[data['emotion'] == i-1].iloc[0]
-        img = row2image(face)
+        img = row2image(face, emotion_map)
         plt.subplot(2,4,i)
         plt.imshow(img[0])
         plt.title(img[1])
@@ -191,7 +167,7 @@ def handle_unloadDataset(emotion_map, file_path):
     """
     li = file_path.split('/')
     if li[len(li)-1] != 'emotion_dataset.zip' and li[len(li)-1] != 'fer2013.csv':
-        print('[ERROR] path not valid plaese check file_path value')
+        PrintsForUser.print_error('[ERROR] path not valid plaese check file_path value')
         return
     else:
         data = open_dataset(file_path)
@@ -199,62 +175,9 @@ def handle_unloadDataset(emotion_map, file_path):
     emotion_counts = check_target_labels(data, emotion_map)
     check_data(data)
     plot_class_distribution(emotion_counts)
-    plot_images(data)
-    """
-    print("##################\n\n\n")
-    new_data = fixUsageValues(data, emotion_map)
-    check_data(new_data)
-    plot_class_distribution(emotion_counts)
-    plot_images(new_data)
-    """
-    
-#handle_unloadDataset(emotion_map, '/Users/shirzlotnik/emotion_dataset/fer2013.csv')
+    plot_images(data, emotion_map)
 
-#li = file_path.split('/')
-#print(li[len(li)-1])
     
     
     
-    
-    
-######################
-# code not in use
-    
-    
-"""
-
-
-def open_dataset4(file_path=None, zip_path=None):
-    
-    #ask the user to put file path for dataset or zip or use deafult path
-    
-    print('Do you want to use deafult path or enter file or zip file?')
-    print('Please press f for dataset file')
-    print('             z for zip file')
-    print('             any other key for deafult')
-
-    ans = input('Enter => ')
-    if ans == 'z':
-        print('Please enter the path of the zip file in your computer')
-        print('Path example for windows -->  C:\\Users\\User\\Desktop\\example.zip')
-        print('Path example for macOs -->  /Users/shirzlotnik/emotion_dataset/example.zip')
-        zip_file_path = input('Enter zip file path => ')
-        zf = zipfile.ZipFile(zip_file_path)
-        data = pd.read_csv(zf.open('fer2013.csv')) #fer2013.csv - file name
-    if ans == 'f':
-        print('Please enter the path of the dataset file in your computer')
-        print('Path example for windows -->  C:\\Users\\User\\Desktop\\example.csv')
-        print('Path example for macOs -->  /Users/shirzlotnik/emotion_dataset/example.csv')
-        data_path = input('Enter dataset file path => ')
-        data = pd.read_csv(data_path) 
-    else:
-        data = pd.read_csv(file_path)
-    ######
-    data = data.rename(columns={'emotion': 'expression'})
-
-    return data
-
-
-
-
-"""
+ 

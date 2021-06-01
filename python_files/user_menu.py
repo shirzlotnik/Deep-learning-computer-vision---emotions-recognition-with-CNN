@@ -14,8 +14,8 @@ this is the main python file that manege the program according to the user choic
 import unload_dataset
 import ModelTrain
 import ProcessingDataset
+import PrintsForUser
 
- 
 
 
 
@@ -23,36 +23,23 @@ file_path = '/Users/shirzlotnik/emotion_dataset/fer2013.csv' # file path in the 
 emotion_map = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
 
 
-#data,fl = unload_dataset.open_dataset()
-# update dataset usage to 70% training, 20% validation and 10% test
-
-#emotion_counts = unload_dataset.check_target_labels(data, emotion_map)
-#new_data = unload_dataset.fixUsageValues(data, emotion_counts)
-#data = new_data
-"""
-data = unload_dataset.open_dataset(file_path)
-data_train = data[data['Usage']=='Training'].copy()
-data_val   = data[data['Usage']=='PublicTest'].copy()
-data_test  = data[data['Usage']=='PrivateTest'].copy()
-"""
-#emotion_counts = unload_dataset.emotion_counts
 
 
 def user_options():
     """
     This function prints for the user his options (UI)
     """
-    print("******************************************")
-    print("*             USER INTERFACE             *")
-    print("*                                        *")
-    print("*   Enter 1 --> download the dataset     *")
-    print("*   Enter 2 --> pre-precess of dataset   *")
-    print("*   Enter 3 --> train the model          *")
-    print("*   Enter 4 --> predict random images    *")
-    print("*   Enter space bar --> exit             *")
-    print("*                                        *")
-    print("******************************************")
-    
+  
+    PrintsForUser.print_option("* * * * * * * * * * * * * * * * * * * * * *")
+    PrintsForUser.print_option("*              USER INTERFACE             *")
+    PrintsForUser.print_option("*                                         *")
+    PrintsForUser.print_option("*   Enter 1 -->  download the dataset     *")
+    PrintsForUser.print_option("*   Enter 2 --> process dataset           *")
+    PrintsForUser.print_option("*   Enter 3 --> train the model and       *")
+    PrintsForUser.print_option("*           Evaluate Test Performance     *")
+    PrintsForUser.print_option("*   Enter space bar --> exit              *")
+    PrintsForUser.print_option("*                                         *")
+    PrintsForUser.print_option("* * * * * * * * * * * * * * * * * * * * * *")
 #user_options()
 
 def case_one(file_path):
@@ -71,12 +58,6 @@ def case_two(data, emotion_map):
     """
     ######
     
-    """
-    preprocessing.print_data_usage_info()
-    print()
-    preprocessing.build_graphs_numberOfExp_forUsage()
-    """
-    
     data_train = data[data['Usage']=='Training'].copy()
     data_val   = data[data['Usage']=='PublicTest'].copy()
     data_test  = data[data['Usage']=='PrivateTest'].copy()
@@ -92,16 +73,6 @@ def case_three(data):
     the visualize training performance will be as well in this part, additional graphs and
     analysis will be added later on
     """
-    """
-    #initilize parameters
-    num_classes = 7 
-    width, height = 48, 48
-    #num_epochs = 50
-    batch_size = 64
-    num_features = 64
-    num_epochs = input('Please enter numer of epoch => ')
-    model = my_Model.my_model.build_model(width, height, num_classes, num_features)
-    """
     
     data_train = data[data['Usage']=='Training'].copy()
     data_val   = data[data['Usage']=='PublicTest'].copy()
@@ -115,23 +86,25 @@ def case_three(data):
 
 def main_menu():
     flag = True
-    user_options()
     """
     defult directories
     this directoties change according to the user activity
     """
-    #directories_file.create_directories_file()
     
     file_path = '/Users/shirzlotnik/emotion_dataset/fer2013.csv' # file path in the computer
-    #zip_path = '/Users/shirzlotnik/emotion_dataset.zip'
     emotion_map = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
+
+    
+    #zip_path = '/Users/shirzlotnik/emotion_dataset.zip'
     #data = unload_dataset.open_dataset(file_path)
-    data = unload_dataset.open_dataset(file_path)
-    data = unload_dataset.fixUsageValues(data, emotion_map)
+    data = None
+    #data = unload_dataset.open_dataset(file_path)
+    #data = unload_dataset.fixUsageValues(data, emotion_map)
 
     
     while(flag):
         #print("--> Your Choice: ")
+        user_options()
         choice = input("==> Enter Your Choice: ")
         print()
 
@@ -139,10 +112,11 @@ def main_menu():
             """
             if the use enter 1 -> the datasat download
             """
-            print("[INFO] Downloading dataset  \n")
+            PrintsForUser.print_process("[INFO] Downloading dataset ")
             case_one(file_path) 
-            print()
-            print("[INFO] Download dataset succecfuly \n")
+            data = unload_dataset.open_dataset(file_path)
+            data = unload_dataset.fixUsageValues(data, emotion_map)
+            PrintsForUser.print_process("[INFO] Download dataset succecfuly \n")
 
             #print()
     
@@ -151,7 +125,13 @@ def main_menu():
             if the use enter 2 -> the pre-processing of the data begins, the user will see how the data is
             sorted, how many images there are with graph.
             """
-            print("[INFO] Process of the dataset\n")
+            
+            if data.empty:
+                PrintsForUser.print_error('[ERROR] Cannot process dataset before dataset was install ')
+                PrintsForUser.print_error('        Please press 1 to unload dataset before pressing 2 \n\n')
+                PrintsForUser.print_process('[INFO] You need to run the program again\n\n')
+                return
+            PrintsForUser.print_process("[INFO] Process of the dataset\n")
             case_two(data, emotion_map)
             
          
@@ -161,9 +141,6 @@ def main_menu():
             after the model is finishied we call it from the trainig module
             """
             case_three(data)
-            
-        if choice == '4':
-            case_Four(model_path,labels_path, data_set, new_images_folder)
             
         if choice == ' ':
             print("[INFO] Exiting...")

@@ -50,7 +50,7 @@ class ProcessDataset:
         print number of *emotion* in *usage*
         """
         for info in data_sorted:
-            print('Number of {} in {} = {} => {}%'.format(self.emotion_map.get(info[0]),
+            print('Number of {} in {} = {} => {:.4f}%'.format(self.emotion_map.get(info[0]),
                   usage, info[1], (info[1]/columns_count)*100))
         
         
@@ -104,8 +104,10 @@ class ProcessDataset:
         
         for info in range(3):
             self.__Setup_axe( dictFor_tuples.get(info)[1])
+            print('Emotion Distribution in {}\n'.format(dictFor_tuples.get(info)[1]))
             self. __print_Fexpression_for_usage(dataUsage_tuple[info].shape[0], dataFexpress_tuple[info], 
                                                 dictFor_tuples.get(info)[1])
+            print()
         print()
         
     def handel_process_dataset(self):

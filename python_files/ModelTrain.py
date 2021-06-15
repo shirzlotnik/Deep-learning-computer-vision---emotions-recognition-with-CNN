@@ -38,8 +38,8 @@ class training_Model:
         self.width = 48
         self.height = 48
         self.num_features = 64
-        self.batch_size = 512
-        self.num_epochs = 3       
+        self.batch_size = 64
+        self.num_epochs = 50       
         self.data = data
         self.data_train = data_train
         self.data_val   = data_val

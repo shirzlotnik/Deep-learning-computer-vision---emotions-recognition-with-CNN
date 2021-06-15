@@ -28,41 +28,17 @@ class ProcessDataset:
         self.data_val = data_val
         self.data_test = data_test
         
-        
-    def __print_data_usage(self):
-        """
-        
-        """
-        print("train shape: {}, \nvalidation shape: {}, \ntest shape: {}".format(
-                self.data_train.shape, self.data_val.shape, self.data_test.shape))
-        print()
-        
 
         
-      
-    def __print_Fexpression_for_usage(self, columns_count, data_sorted, usage):
-        """
-        def print_Usage_Information(columns_count,data_sorted, usage): => in preprocessing.py
         
-        columns_count: data_train.shape[0]- how many of that usage total
-        data_sorted: the sorted data by usage and then by emotion from count_emotion_in_columns()
-        usage: string, the usage
-        print number of *emotion* in *usage*
+    def __Setup_axe(self,usage, title):
         """
-        for info in data_sorted:
-            print('Number of {} in {} = {} => {:.4f}%'.format(self.emotion_map.get(info[0]),
-                  usage, info[1], (info[1]/columns_count)*100))
-        
-        
-        ########
-    def __Setup_axe(self, title):
-        """
-        data: the dataset- DataFrame object
         title: graph title- str
-        sort the dataset by emotion
+        sort the dataset by emotion and plot emotion number bar graph
         """
-        
-        emotion_counts = self.data['emotion'].value_counts(sort=True).reset_index()
+        li = [self.data_train, self.data_val, self.data_test]
+        occ_data = li[usage]
+        emotion_counts = occ_data['emotion'].value_counts(sort=True).reset_index()
         emotion_counts.columns = ['emotion', 'number']
         emotion_counts['emotion'] = emotion_counts['emotion'].map(self.emotion_map)
         # using seaborn libary to plot graphs
@@ -75,10 +51,7 @@ class ProcessDataset:
         
     def __sort_by_usage(self):
         """
-        def count_emotion_in_columns(data): => in preprocessing.py
-        
-        #data: the dataset- DataFrame object
-        the function sort the data by usage and then by facial expression
+        the function sort the emotion column in data by usage 
         return: train_sorted, val_sorted, test_sorted- sorted data by usage
         """
         
@@ -90,33 +63,42 @@ class ProcessDataset:
         val_sorted = sorted(val1.items(), key = lambda d: d[1], reverse = True)
         test_sorted = sorted(test1.items(), key = lambda d: d[1], reverse = True)
         
-        return train_sorted, val_sorted, test_sorted
         
-    def __plot_Fexpression_forUsage(self):
+        return train_sorted, val_sorted, test_sorted
+    
+
+    def __print_emotions_for_usage(self, columns_count, data_sorted, usage):
         """
-        plot bar graph for each of the usages -> number of images per facial expression
-        print 
+        columns_count: data_train.shape[0]- how many of that usage total
+        data_sorted: the sorted data by usage and then by emotion from 
+            count_emotion_in_columns()
+        usage: string, the usage
+        print number of *emotion* in *usage*
+        """
+        for info in data_sorted:
+            print('Number of {} in {} = {} => {:.4f}%'.format(
+                    self.emotion_map.get(info[0]),
+                  usage, info[1], (info[1]/columns_count)*100))
+        
+    def plot_emotions_forUsage(self):
+        """
+        plot bar graph for each of the usages -> number of images per emotion
+        print precentage of emotion from total images in usage
         """
         (trainSort, valSort, testSort) = self.__sort_by_usage()
         dataFexpress_tuple = (trainSort, valSort, testSort)
         dataUsage_tuple = (self.data_train, self.data_val, self.data_test)
-        dictFor_tuples = {0:['train', 'Training data'], 1:['validation','Validation data'], 2:['test','Testing data']}
-        
+        dictFor_tuples = {0:['train', 'Training data'], 1:['validation',
+                          'Validation data'], 2:['test','Testing data']}
+
         for info in range(3):
-            self.__Setup_axe( dictFor_tuples.get(info)[1])
-            print('Emotion Distribution in {}\n'.format(dictFor_tuples.get(info)[1]))
-            self. __print_Fexpression_for_usage(dataUsage_tuple[info].shape[0], dataFexpress_tuple[info], 
-                                                dictFor_tuples.get(info)[1])
+            self.__Setup_axe(info, dictFor_tuples.get(info)[1])
+            print('Emotion Distribution in {}\n'.format(
+                    dictFor_tuples.get(info)[1]))
+            self. __print_emotions_for_usage(dataUsage_tuple[info].shape[0], 
+                        dataFexpress_tuple[info], dictFor_tuples.get(info)[1])
             print()
         print()
-        
-    def handel_process_dataset(self):
-        """
-        this public method manage the process section
-        """
-        self.__print_data_usage()
-        self.__plot_Fexpression_forUsage()
-                
             
             
                 

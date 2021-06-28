@@ -22,9 +22,6 @@ from keras.callbacks import EarlyStopping
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import load_model
 
-import random
-
-import os
 
 
 import my_Model
@@ -38,8 +35,8 @@ class training_Model:
         self.width = 48
         self.height = 48
         self.num_features = 64
-        self.batch_size = 64
-        self.num_epochs = 50       
+        self.batch_size = 512
+        self.num_epochs = 3       
         self.data = data
         self.data_train = data_train
         self.data_val   = data_val
@@ -153,9 +150,7 @@ class training_Model:
         """
         history = self.__train_model()
         self.__plot_lossAndacc(history)
-        self.EvaluateTestPerformance()
-        self.predict_images()
-        
+        self.EvaluateTestPerformance()        
         
         
     def EvaluateTestPerformance(self):
@@ -170,39 +165,8 @@ class training_Model:
                 accuracy_score(test_true, test_pred)))
         
         
-    def predict_images(self):
-        """
-        predicting 5 first images from the dataset and printing the results
-        """
-        test_X, test_Y   = self.__CRNO(self.data_test, "test") #test data
-            
-        
-        #predict num_img randomly
-        x_pred = self.model.predict(test_X[:5])
-        y_res = test_Y[:5]
+    
         
         
-        for i in range(5):
-            x_class_pred = self.__findIndex_for_maxValuew(x_pred[i])
-            y_class_res = self.__findIndex_for_maxValuew(y_res[i])
-            
-            PrintsForUser.print_process('Model predict -> {}, true result -> {}'.format(
-                    x_class_pred, y_class_res))
-        
-        
-        
-    def __findIndex_for_maxValuew(self, li):
-        """
-        the function finds the index that its value is the heighest 
-        li: list
-        return: int- index of hieghest value
-        """
-        ind = 0
-        max_value = 0
-        for info in li:
-            if li[info] > max_value:
-                max_value = li[info]
-                ind = info
-                
-        return ind
+    
 

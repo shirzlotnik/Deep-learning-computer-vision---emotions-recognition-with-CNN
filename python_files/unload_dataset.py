@@ -15,23 +15,20 @@ import zipfile
 
 import matplotlib.pyplot as plt #for the graphs and images
 import seaborn as sns #for the graphs
-
 import PrintsForUser
-
-#file_path = '/Users/shirzlotnik/emotion_dataset/fer2013.csv' # file path in the computer
-#zip_path = '/Users/shirzlotnik/emotion_dataset.zip'
-#emotion_map = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
-
 
 
 def open_dataset(file_path):
     """
-    ask the user to put file path for dataset or zip or use deafult path
+    open the dataset from given path
+    file_path: string, the location of the dataset ot zip file
+        in the user computer
+    return: data, DataFrame object contain the dataset
     """
     data = None
-    li = file_path.split('/')
+    li = file_path.split('/') # need to change to '\' if using windows
     if li[len(li)-1] == 'emotion_dataset.zip':
-        zf = zipfile.ZipFile(zip_path)
+        zf = zipfile.ZipFile(file_path)
         data = pd.read_csv(zf.open('fer2013.csv')) #fer2013.csv - file name
     elif li[len(li)-1] == 'fer2013.csv':
         data = pd.read_csv(file_path)
@@ -44,10 +41,11 @@ def open_dataset(file_path):
 
 def fixUsageValues(data, emotion_map):
     """
+    transer images randomly from training to validation so the dataset 
+    will be splited 70% training, 20% validation and 10% test
     data: the dataset- DataFrame object
-    emotion_counts:
-    transer images randomly from training to validation so the dataset will be splited 
-    70% training, 20% validation and 10% test
+    emotion_map: dictionery contains emotion for index
+    return: data, DataFrame update with the new usage values
     """
     # find how many images we need to tranfet for each emotion -> proportions
     emotion_counts = check_target_labels(data, emotion_map)
@@ -57,8 +55,8 @@ def fixUsageValues(data, emotion_map):
     
     transferImg_list = []
     for info in range(len(number_list)):
-        transferImg_list.append(int(number_list[info] / 10)) # 10% of total number of images per expewssion
-
+        # 10% of total number of images per emotion
+        transferImg_list.append(int(number_list[info] / 10)) 
     
     # change 10% of each facial expression from training to validation
     for i in range(7):
@@ -69,12 +67,11 @@ def fixUsageValues(data, emotion_map):
             
     return data
 
-        
-    
+
 def getIndexList(facex_data):
     """
-    facex_data: slip pandas series object by facial expression
-    return: list of indexes with same facial expression
+    facex_data: slip pandas series object by emotion
+    return: list of indexes with same emotion
     """
     dict_data = facex_data.to_dict('split')
     index_list = dict_data.get('index')
@@ -86,7 +83,7 @@ def check_data(data):
     """
     data: the dataset- DataFrame object
     the function print to user the shape of the dataset, the first 5 lines 
-    and the usage values suppose to be 80% training, 10% validation and 10% test
+    and the usage values suppose to be 70% training, 20% validation and 10% test
     """
     print('Dataset Information')
     print(data.shape) # check data shape
@@ -98,27 +95,23 @@ def check_data(data):
 
 def check_target_labels(data, emotion_map):
     """
+    the function sort the number of images for each emotion
     data: the dataset- DataFrame type
     emotion_map: dictionery for the diffrent emotions 
-    the function sort and print for the user the number of images for each facial expression
-    return: emotion_counts- DataFrame that show how many images for each facial expression
+    return: emotion_counts- DataFrame that show how many images for each emotion
     """
     emotion_counts = data['emotion'].value_counts(sort=True).reset_index()
     emotion_counts.columns = ['emotion', 'number']
     emotion_counts['emotion'] = emotion_counts['emotion'].map(emotion_map)
     print()
     return emotion_counts
-
-#facial_counts = check_target_labels(data, expression_map)
-#new_data = fixUsageValues(data, facial_counts)
-
     
-
 
 def plot_class_distribution(emotion_counts):
     """
+    the function using matplotlib libary to plot to the user a bar graph 
+    for the emotion_counts, y - number of images, x - emotion index
     emotion_counts: DataFrame that show how many images for each emotion
-    the function using matplotlib libary to plot to the user a bar graph for the facial_counts
     """
     plt.figure(figsize=(6,4))
     sns.barplot(emotion_counts.emotion, emotion_counts.number)
@@ -127,13 +120,13 @@ def plot_class_distribution(emotion_counts):
     plt.xlabel('Emotions', fontsize=12)
     plt.show()
 
-# plot some images
 
 def row2image(row, emotion_map):
     '''
     row: row from the dataset, type='pandas.core.series.Series'
-    emotion_map: 
-    the function takes the information from the pixels and emotion columns and tranfer it to 48*48 image
+    emotion_map: dictionery contains emotion for index
+    the function takes the information from the pixels and emotion 
+        columns and tranfer it to 48*48 image
     return: 'numpy.ndarray' of the image
     '''
     pixels, emotions = row['pixels'], emotion_map[row['emotion']]
@@ -148,7 +141,7 @@ def row2image(row, emotion_map):
 def plot_images(data, emotion_map):
     """
     data: the dataset- DataFrame object
-    emotion_map:
+    emotion_map: dictionery contains emotion for index
     the function uses matplotlib libary to plot the images to the user
     """
     plt.figure(0, figsize=(12,6))
@@ -163,6 +156,9 @@ def plot_images(data, emotion_map):
     
 def handle_unloadDataset(emotion_map, file_path):
     """
+    emotion_map: dictionery contains emotion for index
+    file_path: string, the location of the dataset ot zip file
+        in the user computer
     a method that sums up all the methods together
     """
     li = file_path.split('/')
@@ -173,9 +169,11 @@ def handle_unloadDataset(emotion_map, file_path):
         data = open_dataset(file_path)
     data = fixUsageValues(data, emotion_map) #fix train, val, tets values
     emotion_counts = check_target_labels(data, emotion_map)
-    check_data(data)
+    check_data(data)  
     plot_class_distribution(emotion_counts)
     plot_images(data, emotion_map)
+    
+    return data
 
     
     

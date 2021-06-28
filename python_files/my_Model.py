@@ -40,6 +40,7 @@ from keras.callbacks import ModelCheckpoint
 
 
 
+
 """
 num_classes = 7 
 width, height = 48, 48
@@ -64,19 +65,19 @@ class my_model:
         model = keras.Sequential()
         
         # CONV => RELU => CONV => RELU => POOL
-        model.add(Conv2D(2*2*num_features, kernel_size=(3, 3), input_shape=(width, height, 1), data_format='channels_last'))
+        model.add(Conv2D(num_features, kernel_size=(3, 3), input_shape=(width, height, 1), data_format='channels_last'))
         model.add(BatchNormalization())
         model.add(Activation('relu'))
-        model.add(Conv2D(2*2*num_features, kernel_size=(3, 3), padding='same'))
+        model.add(Conv2D(num_features, kernel_size=(3, 3), padding='same'))
         model.add(BatchNormalization())
         model.add(Activation('relu'))
         model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
         
         # CONV => RELU => CONV => RELU => POOL
-        model.add(Conv2D(2*2*num_features, kernel_size=(3, 3), data_format='channels_last'))
+        model.add(Conv2D(2*num_features, kernel_size=(3, 3), data_format='channels_last'))
         model.add(BatchNormalization())
         model.add(Activation('relu'))
-        model.add(Conv2D(2*2*num_features, kernel_size=(3, 3), padding='same'))
+        model.add(Conv2D(2*num_features, kernel_size=(3, 3), padding='same'))
         model.add(BatchNormalization())
         model.add(Activation('relu'))
         model.add(MaxPooling2D(pool_size=(2, 2), strides=(2, 2)))
@@ -93,11 +94,11 @@ class my_model:
         #FC => RELU layers
         model.add(Flatten())
         # dense 1
-        model.add(Dense(2*2*2*num_features))
+        model.add(Dense(2*num_features))
         model.add(BatchNormalization())
         model.add(Activation('relu'))
         # dense 2
-        model.add(Dense(2*2*2*num_features))
+        model.add(Dense(2*2*num_features))
         model.add(BatchNormalization())
         model.add(Activation('relu'))
         # dense 3
@@ -107,13 +108,8 @@ class my_model:
         
         # softmax classifier
         model.add(Dense(num_classes, activation='softmax'))
+        
 
-        """
-        model.compile(optimizer= 'adam' , loss= keras.losses.binary_crossentropy, metrics=['accuracy'])
-
-
-        model.summary()
-        """
         return model
     
 

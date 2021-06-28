@@ -19,9 +19,6 @@ import PrintsForUser
 
 
 
-file_path = '/Users/shirzlotnik/emotion_dataset/fer2013.csv' # file path in the computer
-emotion_map = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
-
 
 
 
@@ -42,14 +39,15 @@ def user_options():
     PrintsForUser.print_option("* * * * * * * * * * * * * * * * * * * * * *")
 #user_options()
 
-def case_one(file_path):
+def case_one(file_path, emotion_map):
     """
     file_path: path to the place the dataset or ziped dataset are
     the function calls module unload_dataset to download the dataset and open it with pandas
     and plot some information about the dataset
     """
     #data , fl = unload_dataset.open_dataset(file_path)
-    unload_dataset.handle_unloadDataset(emotion_map, file_path)
+    data = unload_dataset.handle_unloadDataset(emotion_map, file_path)
+    return data
 
 def case_two(data, emotion_map): 
     """
@@ -63,7 +61,7 @@ def case_two(data, emotion_map):
     data_test  = data[data['Usage']=='PrivateTest'].copy()
     
     process_obj = ProcessingDataset.ProcessDataset(data, emotion_map, data_train, data_val, data_test)
-    process_obj.handel_process_dataset()
+    process_obj.plot_emotions_forUsage()
     
     
 
@@ -81,29 +79,42 @@ def case_three(data):
     train_obj = ModelTrain.training_Model(data, data_train, data_val, data_test)
     train_obj.handle_train()
     
+
+ 
+def check_emptyData(data):
+    """
+    data: DataFrame- the dataset
+    checks if the dataset is empty
+    return: True if empty
+            False if not empty
+    """
+    try:
+        if data.empty:
+            PrintsForUser.print_error('[ERROR] Cannot process dataset before dataset was install ')
+            PrintsForUser.print_error('        Please press 1 to unload dataset before pressing 2 \n\n')
+            PrintsForUser.print_process('[INFO] You need to run the program again\n\n')
+            return True
+    except AttributeError:
+        PrintsForUser.print_error('[ERROR] No dataset has been found ')
+        return True
+
+    return False
+
     
     
 
 def main_menu():
     flag = True
     """
-    defult directories
-    this directoties change according to the user activity
+    defult directories - this directoties change according to the user activity
     """
     
     file_path = '/Users/shirzlotnik/emotion_dataset/fer2013.csv' # file path in the computer
+    #file_path = r'C:\Users\User\Desktop\fer2013.csv' # file path format for user in windows
     emotion_map = {0: 'Angry', 1: 'Disgust', 2: 'Fear', 3: 'Happy', 4: 'Sad', 5: 'Surprise', 6: 'Neutral'}
-
-    
-    #zip_path = '/Users/shirzlotnik/emotion_dataset.zip'
-    #data = unload_dataset.open_dataset(file_path)
     data = None
-    #data = unload_dataset.open_dataset(file_path)
-    #data = unload_dataset.fixUsageValues(data, emotion_map)
-
     
     while(flag):
-        #print("--> Your Choice: ")
         user_options()
         choice = input("==> Enter Your Choice: ")
         print()
@@ -113,27 +124,18 @@ def main_menu():
             if the use enter 1 -> the datasat download
             """
             PrintsForUser.print_process("[INFO] Downloading dataset ")
-            case_one(file_path) 
-            data = unload_dataset.open_dataset(file_path)
-            data = unload_dataset.fixUsageValues(data, emotion_map)
+            data = case_one(file_path, emotion_map) 
             PrintsForUser.print_process("[INFO] Download dataset succecfuly \n")
-
-            #print()
     
         if choice == '2':
             """
             if the use enter 2 -> the pre-processing of the data begins, the user will see how the data is
             sorted, how many images there are with graph.
-            """
-            
-            if data.empty:
-                PrintsForUser.print_error('[ERROR] Cannot process dataset before dataset was install ')
-                PrintsForUser.print_error('        Please press 1 to unload dataset before pressing 2 \n\n')
-                PrintsForUser.print_process('[INFO] You need to run the program again\n\n')
+            """ 
+            if check_emptyData(data):
                 return
             PrintsForUser.print_process("[INFO] Process of the dataset\n")
-            case_two(data, emotion_map)
-            
+            case_two(data, emotion_map) 
          
         if choice == '3':
             """
@@ -149,6 +151,4 @@ def main_menu():
     
 if __name__ == "__main__":
     main_menu()
-
-
 

@@ -82,7 +82,12 @@ def case_three(data):
 
  
 def check_emptyData(data):
-    
+    """
+    data: DataFrame- the dataset
+    checks if the dataset is empty
+    return: True if empty
+            False if not empty
+    """
     try:
         if data.empty:
             PrintsForUser.print_error('[ERROR] Cannot process dataset before dataset was install ')
@@ -94,7 +99,7 @@ def check_emptyData(data):
         return True
 
     return False
-    
+
     
     
 
